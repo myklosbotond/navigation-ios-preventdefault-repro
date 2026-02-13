@@ -1,97 +1,111 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# iOS Swipe preventDefault Regression Reproducer
 
-# Getting Started
+Minimal reproducer for a regression in `@react-navigation/stack` where `event.preventDefault()` is **ignored** during iOS swipe-back gestures in `beforeRemove` listeners.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## The Bug
 
-## Step 1: Start Metro
+After PR [#12845](https://github.com/react-navigation/react-navigation/pull/12845) ("refactor: migrate stack card to function component"), calling `event.preventDefault()` in a `beforeRemove` listener no longer cancels iOS swipe-back gestures. The event fires, `preventDefault()` is called, but the gesture animation completes anyway and the user lands on the previous screen.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+This affects:
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- Custom `navigation.addListener('beforeRemove', ...)` handlers
+- The built-in `usePreventRemove()` hook
 
-```sh
-# Using npm
-npm start
+**`preventDefault()` still works correctly for:**
 
-# OR using Yarn
-yarn start
+- Header back button press
+- `navigation.goBack()` calls
+- Android hardware back button
+
+## Version Presets
+
+| Preset       | `@react-navigation/stack` | Status                                   |
+| ------------ | ------------------------- | ---------------------------------------- |
+| `working`    | `7.6.3`                   | `preventDefault()` works on swipe-back   |
+| `just-broke` | `7.6.4`                   | `preventDefault()` ignored on swipe-back |
+| `latest`     | `7.7.1`                   | `preventDefault()` ignored on swipe-back |
+
+## Setup
+
+```bash
+# Install dependencies
+yarn install
+
+# iOS only: install CocoaPods
+cd ios && bundle install && bundle exec pod install && cd ..
 ```
 
-## Step 2: Build and run your app
+## Testing
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### Switch Between Version Presets
 
-### Android
+```bash
+# Use the last working version
+yarn use:working
 
-```sh
-# Using npm
-npm run android
+# Use the first broken version
+yarn use:just-broke
 
-# OR using Yarn
+# Use the latest stable version
+yarn use:latest
+```
+
+> **Note:** After switching clear the metro cache:
+> `yarn start --reset-cache`
+
+### Run
+
+```bash
+# iOS (where the bug manifests)
+yarn ios
+
+# Android (for comparison — works fine)
 yarn android
 ```
 
-### iOS
+### Steps to Reproduce
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+1. Start the app on iOS (simulator or device)
+2. Tap **"Test: addListener('beforeRemove')"**
+3. Swipe from the left edge of the screen to trigger the back gesture
+4. **Expected:** Event log shows "preventDefault() CALLED", you stay on the test screen
+5. **Actual (broken versions):** Event log shows "preventDefault() CALLED" but you navigate back to Home anyway
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+The **Home screen** shows a red "Return Detection Log" when you arrive back unexpectedly, confirming the bug.
 
-```sh
-bundle install
+Repeat with the **"Test: usePreventRemove()"** screen to confirm the official hook is also affected.
+
+### Expected Results by Preset
+
+| Preset       | iOS Swipe Back           | Header Back | goBack() |
+| ------------ | ------------------------ | ----------- | -------- |
+| `working`    | Blocked (stay on screen) | Blocked     | Blocked  |
+| `just-broke` | **NOT blocked (BUG)**    | Blocked     | Blocked  |
+| `latest`     | **NOT blocked (BUG)**    | Blocked     | Blocked  |
+
+## Likely Root Cause
+
+PR [#12845](https://github.com/react-navigation/react-navigation/pull/12845) refactored the stack `Card` component from a class to a function component. This change (commit [`146cb8d5`](https://github.com/react-navigation/react-navigation/commit/146cb8d5a07111473d918c8ea76f4b0384e41bbb)) altered the gesture handling lifecycle such that `preventDefault()` no longer cancels the swipe-back animation.
+
+Follow-up PR [#12846](https://github.com/react-navigation/react-navigation/pull/12846) addressed animation timing issues from the same refactor but did not fix this `preventDefault()` regression.
+
+## Environment
+
+- React Native: 0.83.2
+- React: 19.2.0
+- Xcode: 16.4
+- iOS Simulator: iPhone 16 Pro - iOS 18.6
+
+## Workaround
+
+The only current workaround is to disable the swipe gesture entirely:
+
+```tsx
+<Stack.Screen
+  name="ProtectedScreen"
+  component={ProtectedScreen}
+  options={{ gestureEnabled: false }}
+/>
 ```
 
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+This removes the gesture entirely instead of intercepting it, which is not ideal.
