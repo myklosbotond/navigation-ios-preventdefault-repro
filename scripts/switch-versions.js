@@ -60,4 +60,4 @@ console.log(`\n✅ Switched to "${preset}" preset:\n`);
 for (const [name, version] of Object.entries(versions)) {
   console.log(`   ${name}@${version}`);
 }
-console.log(`\nRun \`yarn install\` and then \`cd ios && bundle exec pod install\` to apply.\n`);
+console.log(`\nRun \`yarn install\` and then \`yarn start --reset-cache\` to apply.\n`);
