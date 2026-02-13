@@ -2391,20 +2391,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native/new-app-screen@npm:0.83.2":
-  version: 0.83.2
-  resolution: "@react-native/new-app-screen@npm:0.83.2"
-  peerDependencies:
-    "@types/react": ^19.1.0
-    react: "*"
-    react-native: "*"
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-  checksum: 10c0/a376e3ba837fbc0a349bb63b35fe9d4969aa1b1c6cacc4866b12c25deb2de598433d27589b0be1c4b4af48aff74ed5926f265f1fb9656ede0a027fc01bf7e4ce
-  languageName: node
-  linkType: hard
-
 "@react-native/normalize-colors@npm:0.83.2":
   version: 0.83.2
   resolution: "@react-native/normalize-colors@npm:0.83.2"
@@ -2451,26 +2437,6 @@ __metadata:
   peerDependencies:
     react: ">= 18.2.0"
   checksum: 10c0/9921f299b73823355f482c3e61e2e386b2f2231cebcc095f00a2e79c9ac09ef2732786004435b4caa4f8f24d1cb7d6736488008e65b62f48d08504cb6c2431f2
-  languageName: node
-  linkType: hard
-
-"@react-navigation/elements@npm:2.8.2":
-  version: 2.8.2
-  resolution: "@react-navigation/elements@npm:2.8.2"
-  dependencies:
-    color: "npm:^4.2.3"
-    use-latest-callback: "npm:^0.2.4"
-    use-sync-external-store: "npm:^1.5.0"
-  peerDependencies:
-    "@react-native-masked-view/masked-view": ">= 0.2.0"
-    "@react-navigation/native": ^7.1.20
-    react: ">= 18.2.0"
-    react-native: "*"
-    react-native-safe-area-context: ">= 4.0.0"
-  peerDependenciesMeta:
-    "@react-native-masked-view/masked-view":
-      optional: true
-  checksum: 10c0/0e5282f92f2946fd635c2a1c9b444d6d158663ad57669cb87e372587d2313df90cd092737305f999e6223aace75cb7829ef709b1198a8a6bc22aa40821a792e6
   languageName: node
   linkType: hard
 
@@ -8057,9 +8023,7 @@ __metadata:
     "@react-native/babel-preset": "npm:0.83.2"
     "@react-native/eslint-config": "npm:0.83.2"
     "@react-native/metro-config": "npm:0.83.2"
-    "@react-native/new-app-screen": "npm:0.83.2"
     "@react-native/typescript-config": "npm:0.83.2"
-    "@react-navigation/elements": "npm:2.8.2"
     "@react-navigation/native": "npm:7.1.20"
     "@react-navigation/stack": "npm:7.6.4"
     "@types/jest": "npm:^29.5.13"

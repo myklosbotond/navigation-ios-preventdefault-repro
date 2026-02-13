@@ -15,7 +15,6 @@ const presets = {
   working: {
     '@react-navigation/native': '7.1.19',
     '@react-navigation/stack': '7.6.3',
-    '@react-navigation/elements': '2.8.1',
   },
   // First broken versions — the release that includes PR #12845 (commit 146cb8d5)
   // PR #12845: "refactor: migrate stack card to function component (backport)"
@@ -23,13 +22,11 @@ const presets = {
   'just-broke': {
     '@react-navigation/native': '7.1.20',
     '@react-navigation/stack': '7.6.4',
-    '@react-navigation/elements': '2.8.2',
   },
   // Latest stable versions (as of writing)
   latest: {
     '@react-navigation/native': '7.1.28',
     '@react-navigation/stack': '7.7.1',
-    '@react-navigation/elements': '2.9.5',
   },
 };
 
