@@ -11,6 +11,8 @@ This affects:
 - Custom `navigation.addListener('beforeRemove', ...)` handlers
 - The built-in `usePreventRemove()` hook
 
+![Demo video](./assets/react-navigation-prevent-default-demo.mp4)
+
 **`preventDefault()` still works correctly for:**
 
 - Header back button press
